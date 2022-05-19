@@ -7,12 +7,15 @@ package it.polito.tdp.rivers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.rivers.model.Misura;
 import it.polito.tdp.rivers.model.Model;
+import it.polito.tdp.rivers.model.River;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
 
 public class FXMLController {
 	
@@ -25,7 +28,7 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxRiver"
-    private ComboBox<?> boxRiver; // Value injected by FXMLLoader
+    private ComboBox<River> boxRiver; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtStartDate"
     private TextField txtStartDate; // Value injected by FXMLLoader
@@ -47,6 +50,39 @@ public class FXMLController {
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
+    
+    @FXML
+    void handleScegliFiume(ActionEvent event) {
+    	Misura m=model.getStat(boxRiver.getValue());
+    	txtNumMeasurements.clear();
+    	txtFMed.clear();
+    	txtStartDate.clear();
+    	txtEndDate.clear();
+    	txtNumMeasurements.setText(m.getTot()+"");
+    	txtFMed.setText(m.getMedia()+"");
+    	txtStartDate.setText(m.getPrimaM().toString());
+    	txtEndDate.setText(m.getUltimaM().toString());
+    	
+
+    }
+
+    @FXML
+    void handleSimula(ActionEvent event) {
+    	
+    	try {
+    		double a=Double.parseDouble(txtK.getText());
+    		model.loadSimulatore(a,Double.parseDouble(txtFMed.getText()),boxRiver.getValue());
+        	txtResult.clear();
+        	txtResult.setText(model.getGiorniNCmin()+"\n");
+        	txtResult.appendText(model.getCmed()+"");
+    		
+    		
+    	}catch(NumberFormatException e) {
+    		txtResult.setText("INSERIRE UN NUMERO VALIDO");
+    	}
+    	
+
+    }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -62,5 +98,9 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	for(River r:model.getFiumi()) {
+    		boxRiver.getItems().add(r);
+    	}
+    
     }
 }
